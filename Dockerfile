@@ -5,8 +5,9 @@ MAINTAINER Jason Gravel <jgravel@uci.edu>
 USER root
 
 # Add dependency
-RUN pip install --upgrade
+
 RUN apt-get update
+RUN apt-get pip
 RUN apt-get install -y graphviz
 
 
