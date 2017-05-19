@@ -7,7 +7,7 @@ USER root
 # Add dependency
 
 RUN apt-get update
-RUN apt-get pip
+RUN apt-get install pip
 RUN apt-get install -y graphviz
 
 
