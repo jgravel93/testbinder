@@ -2,6 +2,10 @@ FROM debian:jessie
 
 MAINTAINER Jason Gravel <jgravel@uci.edu>
 
+# Base image of the IPython/Jupyter notebook, with conda
+# Intended to be used in a tmpnb installation
+# Customized from https://github.com/jupyter/docker-demo-images/tree/master/common
+
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update -y &&\
@@ -33,13 +37,11 @@ ADD start-notebook.sh /home/main/
 USER main
 
 # Install Anaconda and Jupyter
-RUN wget https://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh
-RUN bash Miniconda-latest-Linux-x86_64.sh -b &&\
-    rm Miniconda-latest-Linux-x86_64.sh
-ENV PATH $HOME/miniconda2/bin:$PATH
+RUN wget https://3230d63b5fc54e62148e-c95ac804525aac4b6dba79b00b39d1d3.ssl.cf1.rackcdn.com/Anaconda2-4.0.0-Linux-x86_64.sh
+RUN bash Anaconda2-4.0.0-Linux-x86_64.sh -b &&\
+    rm Anaconda2-4.0.0-Linux-x86_64.sh
+ENV PATH $HOME/anaconda2/bin:$PATH
 
-RUN /home/main/miniconda2/bin/pip install --upgrade pip
-
-RUN pip install jupyter
+RUN /home/main/anaconda2/bin/pip install --upgrade pip
 
 ENV SHELL /bin/bash
