@@ -1,21 +1,45 @@
-FROM andrewosh/binder-base
+FROM debian:jessie
 
 MAINTAINER Jason Gravel <jgravel@uci.edu>
 
-USER root
+ENV DEBIAN_FRONTEND noninteractive
 
-# Add dependency
+RUN apt-get update -y &&\
+    apt-get install --fix-missing -y curl git vim wget build-essential python-dev bzip2 libsm6\
+      locales nodejs-legacy npm python-virtualenv python-pip gcc gfortran libglib2.0-0 python-qt4 &&\
+    apt-get clean &&\
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*tmp
 
-RUN apt-get update
-RUN apt-get install -y python-pip
-RUN apt-get install -y graphviz
+# set utf8 locale:
+RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && locale-gen
+ENV LANG=en_US.UTF-8 \
+    LC_ALL=en_US.UTF-8
 
+# We run our docker images with a non-root user as a security precaution.
+# main is our user
+RUN useradd -m -s /bin/bash main
+
+EXPOSE 8888
+
+USER main
+ENV HOME /home/main
+ENV SHELL /bin/bash
+ENV USER main
+WORKDIR $HOME
+
+# Add helper scripts
+ADD start-notebook.sh /home/main/
 
 USER main
 
-# Install requirements for Python 2
-ADD requirements.txt requirements.txt
-RUN pip install -r requirements.txt
+# Install Anaconda and Jupyter
+RUN wget https://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh
+RUN bash Miniconda-latest-Linux-x86_64.sh -b &&\
+    rm Miniconda-latest-Linux-x86_64.sh
+ENV PATH $HOME/miniconda2/bin:$PATH
 
-# Install requirements for Python 3
-#RUN /home/main/anaconda/envs/python3/bin/pip install -r requirements.txt
+RUN /home/main/miniconda2/bin/pip install --upgrade pip
+
+RUN pip install jupyter
+
+ENV SHELL /bin/bash
